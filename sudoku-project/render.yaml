@@ -1,0 +1,29 @@
+services:
+  - type: web
+    name: sudoku-backend
+    env: python
+    plan: free
+    autoDeploy: true
+    healthCheckPath: /api/generate
+    buildCommand: |
+      pip install -r sudoku-project/backend/requirements.txt
+    startCommand: |
+      gunicorn app:app --chdir sudoku-project/backend --bind 0.0.0.0:$PORT
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.3
+
+  - type: static
+    name: sudoku-frontend
+    plan: free
+    autoDeploy: true
+    buildCommand: |
+      npm ci --prefix sudoku-project/frontend
+      npm run build --prefix sudoku-project/frontend
+    publishPath: sudoku-project/frontend/dist
+    envVars:
+      - key: VITE_API_URL
+        fromService:
+          type: web
+          name: sudoku-backend
+          property: url
