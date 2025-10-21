@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useRef, useState } from 'react'
 
-const API = import.meta.env.VITE_API_URL || 'http://localhost:5000'
+const API = 'https://sudoku-backend-iwe7.onrender.com'
 
 function emptyState() {
   return {
