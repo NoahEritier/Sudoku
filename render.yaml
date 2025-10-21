@@ -12,19 +12,3 @@ services:
     envVars:
       - key: PYTHON_VERSION
         value: 3.12.3
-
-  - type: web
-    name: sudoku-frontend
-    env: static
-    plan: free
-    autoDeploy: true
-    buildCommand: |
-      npm ci --prefix sudoku-project/frontend
-      npm run build --prefix sudoku-project/frontend
-    staticPublishPath: sudoku-project/frontend/dist
-    envVars:
-      - key: VITE_API_URL
-        fromService:
-          type: web
-          name: sudoku-backend
-          property: url
