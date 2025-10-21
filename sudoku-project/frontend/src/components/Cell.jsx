@@ -26,10 +26,14 @@ export default function Cell({ r, c, value, fixed, focused, setFocused, setCell,
       onClick={onClick}
       className={[
         'relative flex items-center justify-center aspect-square border border-gray-200 dark:border-gray-700 rounded-md',
-        r%3===0?'border-t-2':'', c%3===0?'border-l-2':'', (r+1)%3===0?'border-b-2':'', (c+1)%3===0?'border-r-2':'',
+        r%3===0?'border-t-2 border-t-gray-300 dark:border-t-gray-600':'',
+        c%3===0?'border-l-2 border-l-gray-300 dark:border-l-gray-600':'',
+        (r+1)%3===0?'border-b-2 border-b-gray-300 dark:border-b-gray-600':'',
+        (c+1)%3===0?'border-r-2 border-r-gray-300 dark:border-r-gray-600':'',
         sameRow || sameCol || sameBox ? 'bg-accent/10 dark:bg-accent/5' : '',
         focused?'bg-accent/25 dark:bg-accent/10 ring-2 ring-accent/60':'',
-        fixed?'font-semibold text-gray-900 dark:text-gray-100':'text-accent-900 dark:text-accent-100',
+        fixed?'bg-gray-100 dark:bg-gray-700 font-bold text-gray-900 dark:text-gray-100':'text-accent-700 dark:text-accent-200',
+        fixed?'cursor-default':'cursor-pointer',
         conflict?'bg-red-100 dark:bg-red-900/30':''
       ].filter(Boolean).join(' ')}
     >
@@ -41,7 +45,7 @@ export default function Cell({ r, c, value, fixed, focused, setFocused, setCell,
             const d = i+1
             const active = notes && notes[d]
             const selectedNote = state.noteDigit === d
-            const cls = selectedNote || active ? 'text-accent font-semibold' : 'text-gray-400 dark:text-gray-500'
+            const cls = selectedNote || active ? 'text-accent font-semibold' : 'text-gray-300 dark:text-gray-600'
             return (
               <div key={i} className={["text-center select-none", cls].join(' ')}>{d}</div>
             )

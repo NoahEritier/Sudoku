@@ -2,6 +2,17 @@ import React, { createContext, useContext, useEffect, useRef, useState } from 'r
 
 const API = 'https://sudoku-backend-iwe7.onrender.com'
 
+async function fetchWithTimeout(resource, options = {}, timeoutMs = 15000) {
+  const controller = new AbortController()
+  const id = setTimeout(() => controller.abort(), timeoutMs)
+  try {
+    const res = await fetch(resource, { ...options, signal: controller.signal })
+    return res
+  } finally {
+    clearTimeout(id)
+  }
+}
+
 function emptyState() {
   return {
     board: Array.from({ length: 9 }, () => Array(9).fill(0)),
@@ -96,7 +107,7 @@ export function GameProvider({ children }) {
   const newGame = async (difficulty) => {
     setState(s => ({ ...s, loading: true, lastError: null }))
     try {
-      const res = await fetch(`${API}/api/generate?difficulty=${difficulty}`)
+      const res = await fetchWithTimeout(`${API}/api/generate?difficulty=${difficulty}`)
       if (!res.ok) throw new Error(`HTTP ${res.status}`)
       const data = await res.json()
       setState({
@@ -117,7 +128,7 @@ export function GameProvider({ children }) {
 
   const solve = async () => {
     try {
-      const res = await fetch(`${API}/api/solve`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ board: state.board }) })
+      const res = await fetchWithTimeout(`${API}/api/solve`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ board: state.board }) })
       if (!res.ok) throw new Error(`HTTP ${res.status}`)
       const data = await res.json()
       if (data.ok) setState(s => ({ ...s, board: data.solution }))
@@ -129,7 +140,7 @@ export function GameProvider({ children }) {
 
   const verify = async () => {
     try {
-      const res = await fetch(`${API}/api/solve`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ board: state.board }) })
+      const res = await fetchWithTimeout(`${API}/api/solve`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ board: state.board }) })
       if (!res.ok) throw new Error(`HTTP ${res.status}`)
       const data = await res.json()
       if (!data.ok) return false

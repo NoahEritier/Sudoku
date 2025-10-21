@@ -46,7 +46,7 @@ export default function ControlBar() {
             <button onClick={solve} disabled={state.loading} className="px-3 py-2 rounded-xl bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed text-sm leading-none whitespace-nowrap">Resolver</button>
             <button onClick={undo} disabled={state.loading} className="px-3 py-2 rounded-xl bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed text-sm leading-none whitespace-nowrap">Undo</button>
             <button onClick={redo} disabled={state.loading} className="px-3 py-2 rounded-xl bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed text-sm leading-none whitespace-nowrap">Redo</button>
-            <button onClick={()=> toggleNoteDigit(state.noteDigit || 1)} disabled={state.loading} className={`px-3 py-2 rounded-xl text-sm leading-none whitespace-nowrap ${state.noteDigit? 'bg-accent text-white':'bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed'}`}>Notas</button>
+            <button onClick={()=> state.noteDigit !== null ? toggleNoteDigit(state.noteDigit) : toggleNoteDigit(-1)} disabled={state.loading} className={`px-3 py-2 rounded-xl text-sm leading-none whitespace-nowrap ${state.noteDigit? 'bg-accent text-white':'bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed'}`}>Notas</button>
           </div>
         </div>
 

@@ -59,10 +59,11 @@ def generate_full_solution() -> Board:
 
 def difficulty_to_clues(difficulty: str) -> int:
     mapping = {
-        'easy': 40,
-        'medium': 34,
-        'hard': 28,
-        'expert': 24,
+        # Slightly increase clues for easier levels and create clearer gaps
+        'easy': 45,    # was 40
+        'medium': 36,  # was 34
+        'hard': 30,    # was 28
+        'expert': 24,  # unchanged
     }
     return mapping.get(difficulty, 40)
 
