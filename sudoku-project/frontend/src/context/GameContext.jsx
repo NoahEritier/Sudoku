@@ -21,6 +21,8 @@ function emptyState() {
     completeAt: null,
     showComplete: false,
     gameStarted: false,
+    loading: false,
+    lastError: null,
   }
 }
 
@@ -92,41 +94,63 @@ export function GameProvider({ children }) {
   }
 
   const newGame = async (difficulty) => {
-    const res = await fetch(`${API}/api/generate?difficulty=${difficulty}`)
-    const data = await res.json()
-    setState({
-      ...emptyState(),
-      difficulty,
-      puzzle: data.puzzle,
-      board: data.puzzle.map(row => row.slice()),
-      startTime: Date.now(),
-      gameStarted: true,
-    })
+    setState(s => ({ ...s, loading: true, lastError: null }))
+    try {
+      const res = await fetch(`${API}/api/generate?difficulty=${difficulty}`)
+      if (!res.ok) throw new Error(`HTTP ${res.status}`)
+      const data = await res.json()
+      setState({
+        ...emptyState(),
+        difficulty,
+        puzzle: data.puzzle,
+        board: data.puzzle.map(row => row.slice()),
+        startTime: Date.now(),
+        gameStarted: true,
+        loading: false,
+        lastError: null,
+      })
+    } catch (e) {
+      setState(s => ({ ...s, loading: false, lastError: String(e) }))
+      alert(`No se pudo crear un nuevo juego. Intenta nuevamente en unos segundos. Detalle: ${String(e)}`)
+    }
   }
 
   const solve = async () => {
-    const res = await fetch(`${API}/api/solve`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ board: state.board }) })
-    const data = await res.json()
-    if (data.ok) setState(s => ({ ...s, board: data.solution }))
+    try {
+      const res = await fetch(`${API}/api/solve`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ board: state.board }) })
+      if (!res.ok) throw new Error(`HTTP ${res.status}`)
+      const data = await res.json()
+      if (data.ok) setState(s => ({ ...s, board: data.solution }))
+    } catch (e) {
+      setState(s => ({ ...s, lastError: String(e) }))
+      alert(`No se pudo resolver el tablero. Detalle: ${String(e)}`)
+    }
   }
 
   const verify = async () => {
-    const res = await fetch(`${API}/api/solve`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ board: state.board }) })
-    const data = await res.json()
-    if (!data.ok) return false
-    let mismatches = 0
-    for (let r = 0; r < 9; r++) {
-      for (let c = 0; c < 9; c++) {
-        if (state.board[r][c] !== 0 && state.board[r][c] !== data.solution[r][c]) mismatches++
+    try {
+      const res = await fetch(`${API}/api/solve`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ board: state.board }) })
+      if (!res.ok) throw new Error(`HTTP ${res.status}`)
+      const data = await res.json()
+      if (!data.ok) return false
+      let mismatches = 0
+      for (let r = 0; r < 9; r++) {
+        for (let c = 0; c < 9; c++) {
+          if (state.board[r][c] !== 0 && state.board[r][c] !== data.solution[r][c]) mismatches++
+        }
       }
+      setState(s => ({ ...s, errors: Math.min(3, s.errors + (mismatches > 0 ? 1 : 0)) }))
+      const complete = state.board.every(row => row.every(v => v !== 0))
+      if (complete) {
+        const correct = state.board.flat().every((v, i) => v === data.solution[Math.floor(i/9)][i%9])
+        if (correct) setState(s => ({ ...s, showComplete: true, completeAt: Date.now() }))
+      }
+      return mismatches === 0
+    } catch (e) {
+      setState(s => ({ ...s, lastError: String(e) }))
+      alert(`No se pudo verificar el tablero. Detalle: ${String(e)}`)
+      return false
     }
-    setState(s => ({ ...s, errors: Math.min(3, s.errors + (mismatches > 0 ? 1 : 0)) }))
-    const complete = state.board.every(row => row.every(v => v !== 0))
-    if (complete) {
-      const correct = state.board.flat().every((v, i) => v === data.solution[Math.floor(i/9)][i%9])
-      if (correct) setState(s => ({ ...s, showComplete: true, completeAt: Date.now() }))
-    }
-    return mismatches === 0
   }
 
   return (

@@ -29,11 +29,11 @@ export default function ControlBar() {
           <div className="text-xs opacity-70 mb-2 px-1">Números</div>
           <div className="grid grid-cols-9 gap-1 md:gap-2">
             {Array.from({length:9}).map((_,i)=> (
-              <button key={i} onClick={()=> onDigit(i+1)} className="px-3 py-2 rounded-xl bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-sm font-medium leading-none whitespace-nowrap">
+              <button key={i} onClick={()=> onDigit(i+1)} disabled={state.loading} className="px-3 py-2 rounded-xl bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium leading-none whitespace-nowrap">
                 {i+1}
               </button>
             ))}
-            <button onClick={onErase} className="col-span-9 px-3 py-2 rounded-xl bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-sm leading-none whitespace-nowrap">Borrar</button>
+            <button onClick={onErase} disabled={state.loading} className="col-span-9 px-3 py-2 rounded-xl bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed text-sm leading-none whitespace-nowrap">Borrar</button>
           </div>
         </div>
 
@@ -41,12 +41,12 @@ export default function ControlBar() {
         <div className="flex-1 min-w-[240px] max-w-[420px]">
           <div className="text-xs opacity-70 mb-2 px-1">Controles</div>
           <div className="flex flex-wrap items-center gap-2">
-            <button onClick={()=> setState(s=>({ ...s, validateLive: !s.validateLive }))} className="px-3 py-2 rounded-xl bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-sm leading-none whitespace-nowrap">Validación {state.validateLive? 'ON':'OFF'}</button>
-            <button onClick={verify} className="px-3 py-2 rounded-xl bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-sm leading-none whitespace-nowrap">Verificar</button>
-            <button onClick={solve} className="px-3 py-2 rounded-xl bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-sm leading-none whitespace-nowrap">Resolver</button>
-            <button onClick={undo} className="px-3 py-2 rounded-xl bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-sm leading-none whitespace-nowrap">Undo</button>
-            <button onClick={redo} className="px-3 py-2 rounded-xl bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-sm leading-none whitespace-nowrap">Redo</button>
-            <button onClick={()=> toggleNoteDigit(state.noteDigit || 1)} className={`px-3 py-2 rounded-xl text-sm leading-none whitespace-nowrap ${state.noteDigit? 'bg-accent text-white':'bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600'}`}>Notas</button>
+            <button onClick={()=> setState(s=>({ ...s, validateLive: !s.validateLive }))} disabled={state.loading} className="px-3 py-2 rounded-xl bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed text-sm leading-none whitespace-nowrap">Validación {state.validateLive? 'ON':'OFF'}</button>
+            <button onClick={verify} disabled={state.loading} className="px-3 py-2 rounded-xl bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed text-sm leading-none whitespace-nowrap">Verificar</button>
+            <button onClick={solve} disabled={state.loading} className="px-3 py-2 rounded-xl bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed text-sm leading-none whitespace-nowrap">Resolver</button>
+            <button onClick={undo} disabled={state.loading} className="px-3 py-2 rounded-xl bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed text-sm leading-none whitespace-nowrap">Undo</button>
+            <button onClick={redo} disabled={state.loading} className="px-3 py-2 rounded-xl bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed text-sm leading-none whitespace-nowrap">Redo</button>
+            <button onClick={()=> toggleNoteDigit(state.noteDigit || 1)} disabled={state.loading} className={`px-3 py-2 rounded-xl text-sm leading-none whitespace-nowrap ${state.noteDigit? 'bg-accent text-white':'bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed'}`}>Notas</button>
           </div>
         </div>
 
@@ -55,8 +55,9 @@ export default function ControlBar() {
           <div className="text-xs opacity-70 mb-2 px-1">Nuevo juego</div>
           <div className="flex flex-wrap items-center gap-2">
             {['easy','medium','hard','expert'].map(d => (
-              <button key={d} onClick={()=> newGame(d)} className="px-3 py-2 rounded-xl bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-sm leading-none capitalize whitespace-nowrap">{d}</button>
+              <button key={d} onClick={()=> newGame(d)} disabled={state.loading} className="px-3 py-2 rounded-xl bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed text-sm leading-none capitalize whitespace-nowrap">{d}</button>
             ))}
+            {state.loading && <div className="ml-2 text-xs opacity-70">Cargando...</div>}
             <div className="ml-auto text-xs opacity-70 whitespace-nowrap">Tiempo {Math.floor(state.elapsed/1000)}s · Errores {state.errors}/3</div>
           </div>
         </div>
